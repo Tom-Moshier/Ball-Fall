@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E2544C1C1EC2561000FE8730 /* MainMenuScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = E2544C191EC2561000FE8730 /* MainMenuScene.sks */; };
+		E2544C1D1EC2561000FE8730 /* MainMenuScene.m in Sources */ = {isa = PBXBuildFile; fileRef = E2544C1A1EC2561000FE8730 /* MainMenuScene.m */; };
 		E2A59A9A1EC1508800D09D5D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E2A59A991EC1508800D09D5D /* main.m */; };
 		E2A59A9D1EC1508800D09D5D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2A59A9C1EC1508800D09D5D /* AppDelegate.m */; };
 		E2A59A9F1EC1508800D09D5D /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = E2A59A9E1EC1508800D09D5D /* GameScene.sks */; };
@@ -19,6 +21,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E2544C191EC2561000FE8730 /* MainMenuScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenuScene.sks; sourceTree = "<group>"; };
+		E2544C1A1EC2561000FE8730 /* MainMenuScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenuScene.m; sourceTree = "<group>"; };
+		E2544C1B1EC2561000FE8730 /* MainMenuScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenuScene.h; sourceTree = "<group>"; };
 		E2A59A951EC1508800D09D5D /* p08-moshier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "p08-moshier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2A59A991EC1508800D09D5D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E2A59A9B1EC1508800D09D5D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -75,6 +80,9 @@
 				E2A59AA61EC1508800D09D5D /* GameViewController.m */,
 				E2A59AA81EC1508800D09D5D /* Main.storyboard */,
 				E2A59AAB1EC1508800D09D5D /* Assets.xcassets */,
+				E2544C191EC2561000FE8730 /* MainMenuScene.sks */,
+				E2544C1A1EC2561000FE8730 /* MainMenuScene.m */,
+				E2544C1B1EC2561000FE8730 /* MainMenuScene.h */,
 				E2A59AAD1EC1508800D09D5D /* LaunchScreen.storyboard */,
 				E2A59AB01EC1508800D09D5D /* Info.plist */,
 				E2A59A981EC1508800D09D5D /* Supporting Files */,
@@ -153,6 +161,7 @@
 				E2A59A9F1EC1508800D09D5D /* GameScene.sks in Resources */,
 				E2A59AAC1EC1508800D09D5D /* Assets.xcassets in Resources */,
 				E2A59AAF1EC1508800D09D5D /* LaunchScreen.storyboard in Resources */,
+				E2544C1C1EC2561000FE8730 /* MainMenuScene.sks in Resources */,
 				E2A59AA11EC1508800D09D5D /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -165,6 +174,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2A59AA71EC1508800D09D5D /* GameViewController.m in Sources */,
+				E2544C1D1EC2561000FE8730 /* MainMenuScene.m in Sources */,
 				E2A59A9D1EC1508800D09D5D /* AppDelegate.m in Sources */,
 				E2A59AA41EC1508800D09D5D /* GameScene.m in Sources */,
 				E2A59A9A1EC1508800D09D5D /* main.m in Sources */,
@@ -326,6 +336,7 @@
 				E2A59AB51EC1508800D09D5D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

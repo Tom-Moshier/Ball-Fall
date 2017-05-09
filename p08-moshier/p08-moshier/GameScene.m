@@ -8,20 +8,19 @@
 
 #import "GameScene.h"
 
-typedef NS_OPTIONS(uint32_t, CollisionCategory) {
-    CollisionCategoryBall = 0x1 << 1,
-    CollisionCategoryRods = 0x1 << 2,
-};
-
 @interface GameScene () <SKPhysicsContactDelegate> {
     SKSpriteNode *aCircle;
     SKShapeNode *circleShape;
+    
+    SKLabelNode* scoreLabel;
     
     CGFloat xAcceleration;
     
     bool gameOver;
     bool touchLeft;
     bool touchRight;
+    
+    int score;
 }
 
 @end;
@@ -30,11 +29,19 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
 
 - (void)didMoveToView:(SKView *)view {
     [self addBall];
-    self.physicsWorld.gravity = CGVectorMake(0.0f, 0.0f);
+    self.physicsWorld.gravity = CGVectorMake(0.0f, -9.8f);
     self.physicsWorld.contactDelegate = self;
     gameOver = false;
     xAcceleration = 0;
-    NSLog(@"%f",self.frame.size.width/4);
+    
+    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
+    scoreLabel.fontSize = 30;
+    scoreLabel.fontColor = [SKColor whiteColor];
+    scoreLabel.position = CGPointMake(0, self.frame.size.height/2 -30);
+    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    score = 0;
+    scoreLabel.text = [NSString stringWithFormat:@"%d", score];
+    [self addChild:scoreLabel];
 }
 
 - (void) addBall {
@@ -55,8 +62,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     [aCircle addChild:circleShape];
     CGPathRelease(bodyPath);
     circleShape.fillColor = [SKColor whiteColor];
-    circleShape.physicsBody.categoryBitMask = CollisionCategoryBall;
-    aCircle.physicsBody.categoryBitMask = CollisionCategoryBall;
     aCircle.position = CGPointMake(0, -self.frame.size.height/2 +100);
     [self addChild:aCircle];
 }
@@ -86,7 +91,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
 
 
 -(void)update:(CFTimeInterval)currentTime {
-    if(!gameOver) {
+    if(!gameOver && aCircle.physicsBody.dynamic == YES) {
         aCircle.physicsBody.velocity = CGVectorMake(xAcceleration * 600.0f, aCircle.physicsBody.velocity.dy);
         if (aCircle.position.x < -self.frame.size.width/2) {
             aCircle.position = CGPointMake(self.frame.size.width/2, aCircle.position.y);
@@ -106,7 +111,17 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         if(xAcceleration < -1.5) {
             xAcceleration = -1.5;
         }
+        score++;
+        scoreLabel.text = [NSString stringWithFormat:@"%d", score];
+        if(aCircle.position.y > self.frame.size.height/2) {
+            gameOver = true;
+            [self gameOver];
+        }
     }
+}
+
+-(void)gameOver {
+    
 }
 
 @end
