@@ -8,75 +8,105 @@
 
 #import "GameScene.h"
 
-@implementation GameScene {
-    SKShapeNode *_spinnyNode;
-    SKLabelNode *_label;
+typedef NS_OPTIONS(uint32_t, CollisionCategory) {
+    CollisionCategoryBall = 0x1 << 1,
+    CollisionCategoryRods = 0x1 << 2,
+};
+
+@interface GameScene () <SKPhysicsContactDelegate> {
+    SKSpriteNode *aCircle;
+    SKShapeNode *circleShape;
+    
+    CGFloat xAcceleration;
+    
+    bool gameOver;
+    bool touchLeft;
+    bool touchRight;
 }
+
+@end;
+
+@implementation GameScene
 
 - (void)didMoveToView:(SKView *)view {
-    // Setup your scene here
-    
-    // Get label node from scene and store it for use later
-    _label = (SKLabelNode *)[self childNodeWithName:@"//helloLabel"];
-    
-    _label.alpha = 0.0;
-    [_label runAction:[SKAction fadeInWithDuration:2.0]];
-    
-    CGFloat w = (self.size.width + self.size.height) * 0.05;
-    
-    // Create shape node to use during mouse interaction
-    _spinnyNode = [SKShapeNode shapeNodeWithRectOfSize:CGSizeMake(w, w) cornerRadius:w * 0.3];
-    _spinnyNode.lineWidth = 2.5;
-    
-    [_spinnyNode runAction:[SKAction repeatActionForever:[SKAction rotateByAngle:M_PI duration:1]]];
-    [_spinnyNode runAction:[SKAction sequence:@[
-                                                [SKAction waitForDuration:0.5],
-                                                [SKAction fadeOutWithDuration:0.5],
-                                                [SKAction removeFromParent],
-                                                ]]];
+    [self addBall];
+    self.physicsWorld.gravity = CGVectorMake(0.0f, 0.0f);
+    self.physicsWorld.contactDelegate = self;
+    gameOver = false;
+    xAcceleration = 0;
+    NSLog(@"%f",self.frame.size.width/4);
 }
 
-
-- (void)touchDownAtPoint:(CGPoint)pos {
-    SKShapeNode *n = [_spinnyNode copy];
-    n.position = pos;
-    n.strokeColor = [SKColor greenColor];
-    [self addChild:n];
+- (void) addBall {
+    //Add a ball with physics
+    //Drawing the ball was found from here: http://stackoverflow.com/questions/24078687/draw-smooth-circle-in-ios-sprite-kit
+    float radius = 15.0;
+    aCircle = [SKSpriteNode spriteNodeWithColor:[UIColor clearColor] size:CGSizeMake(radius * 2, radius * 2)];
+    SKPhysicsBody *circleBody = [SKPhysicsBody bodyWithCircleOfRadius:radius];
+    [circleBody setDynamic:NO];
+    [circleBody setUsesPreciseCollisionDetection:YES];
+    aCircle.physicsBody = circleBody;
+    aCircle.physicsBody.collisionBitMask = 0;
+    CGPathRef bodyPath = CGPathCreateWithEllipseInRect(CGRectMake(-[aCircle size].width / 2, -[aCircle size].height / 2, [aCircle size].width, [aCircle size].width), nil);
+    circleShape = [SKShapeNode node];
+    [circleShape setFillColor:[UIColor redColor]];
+    [circleShape setLineWidth:0];
+    [circleShape setPath:bodyPath];
+    [aCircle addChild:circleShape];
+    CGPathRelease(bodyPath);
+    circleShape.fillColor = [SKColor whiteColor];
+    circleShape.physicsBody.categoryBitMask = CollisionCategoryBall;
+    aCircle.physicsBody.categoryBitMask = CollisionCategoryBall;
+    aCircle.position = CGPointMake(0, -self.frame.size.height/2 +100);
+    [self addChild:aCircle];
 }
 
-- (void)touchMovedToPoint:(CGPoint)pos {
-    SKShapeNode *n = [_spinnyNode copy];
-    n.position = pos;
-    n.strokeColor = [SKColor blueColor];
-    [self addChild:n];
-}
-
-- (void)touchUpAtPoint:(CGPoint)pos {
-    SKShapeNode *n = [_spinnyNode copy];
-    n.position = pos;
-    n.strokeColor = [SKColor redColor];
-    [self addChild:n];
-}
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    // Run 'Pulse' action from 'Actions.sks'
-    [_label runAction:[SKAction actionNamed:@"Pulse"] withKey:@"fadeInOut"];
-    
-    for (UITouch *t in touches) {[self touchDownAtPoint:[t locationInNode:self]];}
-}
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
-    for (UITouch *t in touches) {[self touchMovedToPoint:[t locationInNode:self]];}
+    if(!gameOver) {
+        if(aCircle.physicsBody.dynamic == NO) {
+            aCircle.physicsBody.dynamic = YES;
+        }
+        UITouch *touch=[[event allTouches]anyObject];
+        CGPoint point= [touch locationInView:self.view];
+        if(point.x > self.frame.size.width/4) {
+            touchRight = true;
+        }
+        else {
+            touchLeft = true;
+        }
+
+    }
 }
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    for (UITouch *t in touches) {[self touchUpAtPoint:[t locationInNode:self]];}
+    touchRight = false;
+    touchLeft = false;
 }
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    for (UITouch *t in touches) {[self touchUpAtPoint:[t locationInNode:self]];}
-}
+
 
 
 -(void)update:(CFTimeInterval)currentTime {
-    // Called before each frame is rendered
+    if(!gameOver) {
+        aCircle.physicsBody.velocity = CGVectorMake(xAcceleration * 600.0f, aCircle.physicsBody.velocity.dy);
+        if (aCircle.position.x < -self.frame.size.width/2) {
+            aCircle.position = CGPointMake(self.frame.size.width/2, aCircle.position.y);
+        }
+        else if (aCircle.position.x > self.frame.size.width/2) {
+            aCircle.position = CGPointMake(-self.frame.size.width/2, aCircle.position.y);
+        }
+        if(touchRight) {
+            xAcceleration = (xAcceleration += 0.02);
+        }
+        if(touchLeft) {
+            xAcceleration = (xAcceleration += -0.02);
+        }
+        if(xAcceleration > 1.5) {
+            xAcceleration = 1.5;
+        }
+        if(xAcceleration < -1.5) {
+            xAcceleration = -1.5;
+        }
+    }
 }
 
 @end
