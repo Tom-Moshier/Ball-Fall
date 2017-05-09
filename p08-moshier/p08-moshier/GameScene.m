@@ -10,15 +10,20 @@
 
 @interface GameScene () <SKPhysicsContactDelegate> {
     SKSpriteNode *aCircle;
+
     SKShapeNode *circleShape;
+    SKShapeNode *myRectangle1;
     
     SKLabelNode* scoreLabel;
+    
+    SKNode* holder1;
     
     CGFloat xAcceleration;
     
     bool gameOver;
     bool touchLeft;
     bool touchRight;
+    
     
     int score;
 }
@@ -42,6 +47,10 @@
     score = 0;
     scoreLabel.text = [NSString stringWithFormat:@"%d", score];
     [self addChild:scoreLabel];
+    CGPoint origin;
+    origin.y = -200;
+    origin.x = -200;
+    [self addRectangle:origin];
 }
 
 - (void) addBall {
@@ -64,6 +73,25 @@
     circleShape.fillColor = [SKColor whiteColor];
     aCircle.position = CGPointMake(0, -self.frame.size.height/2 +100);
     [self addChild:aCircle];
+}
+
+- (void)addRectangle:(CGPoint)origin{
+    CGSize size;
+    size.height = 20;
+    size.width = self.frame.size.width;
+    CGRect rect;
+    rect.origin = origin;
+    rect.size = size;
+    
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle1 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle1.strokeColor = [SKColor greenColor];
+    myRectangle1.fillColor = [SKColor greenColor];
+    myRectangle1.zRotation = 0;
+    myRectangle1.physicsBody = [SKPhysicsBody bodyWithPolygonFromPath:(path.CGPath)];
+    myRectangle1.physicsBody.affectedByGravity = false;
+    [self addChild:myRectangle1];
 }
 
 

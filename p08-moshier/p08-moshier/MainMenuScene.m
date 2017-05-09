@@ -23,6 +23,7 @@
     SKSpriteNode *aCircle;
     SKShapeNode *circleShape;
     
+    
 }
 
 @end
@@ -45,14 +46,14 @@
                                                  ]];
     SKAction *repeat = [SKAction repeatActionForever:flashAction];
     [instruct5 runAction:repeat];
-    SKAction *flipBottle = [SKAction sequence:@[
+    SKAction *fallBall = [SKAction sequence:@[
                                                  [SKAction runBlock:^{ [self fall:1]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:2]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:3]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:4]; }], [SKAction waitForDuration:.75],
                                                  ]];
-    SKAction *repeatFlip = [SKAction repeatActionForever:flipBottle];
-    [self runAction:repeatFlip];
+    SKAction *fallBallRepeat = [SKAction repeatActionForever:fallBall];
+    [self runAction:fallBallRepeat];
 }
 
 -(void) createStartLabels {
@@ -116,7 +117,7 @@
     [aCircle addChild:circleShape];
     CGPathRelease(bodyPath);
     circleShape.fillColor = [SKColor whiteColor];
-    aCircle.position = CGPointMake(0, -self.frame.size.height/2 +100);
+    aCircle.position = CGPointMake(0, 0);
     [self addChild:aCircle];
 }
 
