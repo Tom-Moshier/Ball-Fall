@@ -23,6 +23,13 @@
     SKSpriteNode *aCircle;
     SKShapeNode *circleShape;
     
+    SKShapeNode *myRectangle1;
+    SKShapeNode *myRectangle2;
+    SKShapeNode *myRectangle3;
+    SKShapeNode *myRectangle4;
+    SKShapeNode *myRectangle5;
+    SKShapeNode *myRectangle6;
+    
     
 }
 
@@ -46,11 +53,14 @@
                                                  ]];
     SKAction *repeat = [SKAction repeatActionForever:flashAction];
     [instruct5 runAction:repeat];
+    [self addRectangles];
     SKAction *fallBall = [SKAction sequence:@[
                                                  [SKAction runBlock:^{ [self fall:1]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:2]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:3]; }], [SKAction waitForDuration:.75],
                                                  [SKAction runBlock:^{ [self fall:4]; }], [SKAction waitForDuration:.75],
+                                                 [SKAction runBlock:^{ [self fall:5]; }], [SKAction waitForDuration:.75],
+                                                 [SKAction runBlock:^{ [self fall:6]; }], [SKAction waitForDuration:.75],
                                                  ]];
     SKAction *fallBallRepeat = [SKAction repeatActionForever:fallBall];
     [self runAction:fallBallRepeat];
@@ -121,18 +131,108 @@
     [self addChild:aCircle];
 }
 
+-(void) addRectangles {
+    CGSize size;
+    size.height = 20;
+    size.width = self.frame.size.width;
+    CGRect rect;
+    CGPoint origin;
+    origin.y = 0;
+    origin.x = 30;
+    rect.origin = origin;
+    rect.size = size;
+    
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle1 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle1.strokeColor = [SKColor greenColor];
+    myRectangle1.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle1];
+    
+
+    origin.y = 100;
+    origin.x = -100;
+    rect.origin = origin;
+    rect.size = size;
+    
+    path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle2 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle2.strokeColor = [SKColor greenColor];
+    myRectangle2.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle2];
+    
+ 
+    origin.y = 200;
+    origin.x = 100;
+    rect.origin = origin;
+    rect.size = size;
+    
+    path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle3 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle3.strokeColor = [SKColor greenColor];
+    myRectangle3.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle3];
+    
+
+    origin.y = 200;
+    origin.x = -750;
+    rect.origin = origin;
+    rect.size = size;
+    
+    path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle4 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle4.strokeColor = [SKColor greenColor];
+    myRectangle4.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle4];
+    
+    origin.y = 100;
+    origin.x = -950;
+    rect.origin = origin;
+    rect.size = size;
+    
+    path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle5 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle5.strokeColor = [SKColor greenColor];
+    myRectangle5.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle5];
+
+    
+    origin.y = 0;
+    origin.x = -800;
+    rect.origin = origin;
+    rect.size = size;
+    
+    path = [UIBezierPath bezierPathWithRect:rect];
+    
+    myRectangle6 = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myRectangle6.strokeColor = [SKColor greenColor];
+    myRectangle6.fillColor = [SKColor greenColor];
+    [self addChild:myRectangle6];
+    
+}
+
 -(void) fall:(int)num {
     if(num == 1) {
-        
+        aCircle.position = CGPointMake(-100, 237);
     }
     else if(num == 2) {
-        
+        aCircle.position = CGPointMake(0, 237);
     }
     else if(num == 3) {
-        
+        aCircle.position = CGPointMake(38, 138);
+    }
+    else if(num == 4) {
+        aCircle.position = CGPointMake(-50, 138);
+    }
+    else if(num == 5) {
+        aCircle.position = CGPointMake(-150, 37);
     }
     else {
-        
+        aCircle.position = CGPointMake(0, 0);
     }
 }
 
