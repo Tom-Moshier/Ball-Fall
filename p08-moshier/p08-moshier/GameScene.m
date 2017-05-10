@@ -8,18 +8,23 @@
 
 #import "GameScene.h"
 
+typedef NS_OPTIONS(uint32_t, CollisionCategory) {
+    CollisionCategoryPlayer   = 0x1 << 0,
+    CollisionCategoryRegularPlatform = 0x1 << 1,
+};
+
 @interface GameScene () <SKPhysicsContactDelegate> {
     SKSpriteNode *aCircle;
 
     SKShapeNode *circleShape;
-    SKShapeNode *myRectangle1;
+    SKShapeNode *topBar;
     
     SKLabelNode* scoreLabel;
     SKLabelNode* gameOverLabel;
     SKLabelNode* finalScore;
     SKLabelNode* startNode;
     
-    SKNode* holder1;
+    SKNode* holder;
     
     CGFloat xAcceleration;
     
@@ -27,7 +32,7 @@
     bool touchLeft;
     bool touchRight;
     
-    
+    double speed;
     int score;
 }
 
@@ -48,17 +53,37 @@
     xAcceleration = 0;
     
     scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
-    scoreLabel.fontSize = 30;
+    scoreLabel.fontSize = 40;
     scoreLabel.fontColor = [SKColor whiteColor];
-    scoreLabel.position = CGPointMake(0, self.frame.size.height/2 -30);
+    scoreLabel.position = CGPointMake(0, self.frame.size.height/2 -50);
     scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
     score = 0;
     scoreLabel.text = [NSString stringWithFormat:@"%d", score];
+    
+    holder = [SKNode node];
+    int y = -self.size.height/2;
+    while(y <= self.size.height/2-50) {
+        [self addRectangle:y];
+        y+=100;
+    }
+    [self addChild:holder];
     [self addChild:scoreLabel];
+    
+    CGSize size;
+    size.height = 2;
+    size.width = self.frame.size.width;
+    CGRect rect;
     CGPoint origin;
-    origin.y = -200;
-    origin.x = -200;
-    [self addRectangle:origin];
+    origin.x = -self.frame.size.width/2;
+    origin.y = self.frame.size.height/2 -65;
+    rect.origin = origin;
+    rect.size = size;
+    
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:rect];
+    topBar = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    topBar.strokeColor = [SKColor whiteColor];
+    topBar.fillColor = [SKColor whiteColor];
+    [self addChild:topBar];
 }
 
 - (void) addBall {
@@ -79,27 +104,105 @@
     [aCircle addChild:circleShape];
     CGPathRelease(bodyPath);
     circleShape.fillColor = [SKColor whiteColor];
-    aCircle.position = CGPointMake(0, -self.frame.size.height/2 +100);
+    aCircle.position = CGPointMake(0, -self.frame.size.height/2 +50);
     [self addChild:aCircle];
+    
+    aCircle.physicsBody.usesPreciseCollisionDetection = YES;
+    aCircle.physicsBody.categoryBitMask = CollisionCategoryPlayer;
+    aCircle.physicsBody.collisionBitMask = 0; // will simulate using predetmined actions by platforms
+    aCircle.physicsBody.contactTestBitMask = CollisionCategoryRegularPlatform;
 }
 
-- (void)addRectangle:(CGPoint)origin{
+- (void)addRectangle:(int)y{
     CGSize size;
     size.height = 20;
     size.width = self.frame.size.width;
     CGRect rect;
+    CGRect rect2;
+    int x = [self getRandomNumberBetween:-self.size.width/2+50 to:self.size.width/2-50];
+    NSLog(@"x: %d\n",x);
+    CGPoint origin;
+    origin.x = x;
+    origin.y = y;
     rect.origin = origin;
+    origin.x += -850;
+    rect2.origin = origin;
     rect.size = size;
+    rect2.size = size;
     
+    UIBezierPath *path2 = [UIBezierPath bezierPathWithRect:rect2];
     UIBezierPath *path = [UIBezierPath bezierPathWithRect:rect];
+    
+    SKShapeNode *myRectangle1;
+    SKShapeNode *myRectangle2;
     
     myRectangle1 = [SKShapeNode shapeNodeWithPath:path.CGPath];
     myRectangle1.strokeColor = [SKColor greenColor];
     myRectangle1.fillColor = [SKColor greenColor];
-    myRectangle1.zRotation = 0;
     myRectangle1.physicsBody = [SKPhysicsBody bodyWithPolygonFromPath:(path.CGPath)];
-    myRectangle1.physicsBody.affectedByGravity = false;
-    [self addChild:myRectangle1];
+    myRectangle1.physicsBody.dynamic = YES;
+    myRectangle1.physicsBody.affectedByGravity = NO;
+    myRectangle1.name = @"Rect";
+    
+    myRectangle1.physicsBody.collisionBitMask = 0;
+    [holder addChild:myRectangle1];
+    
+    myRectangle2 = [SKShapeNode shapeNodeWithPath:path2.CGPath];
+    myRectangle2.strokeColor = [SKColor greenColor];
+    myRectangle2.fillColor = [SKColor greenColor];
+    myRectangle2.physicsBody = [SKPhysicsBody bodyWithPolygonFromPath:(path2.CGPath)];
+    myRectangle2.physicsBody.dynamic = YES;
+    myRectangle2.physicsBody.affectedByGravity = NO;
+    myRectangle2.physicsBody.collisionBitMask = 0;
+    myRectangle2.name = @"Rect";
+    [holder addChild:myRectangle2];
+}
+
+-(int)getRandomNumberBetween:(int)from to:(int)to {
+    return (int)from + arc4random() % (to-from+1);
+}
+
+-(void) moveRectangles:(int)number {
+    SKAction *rotation = [SKAction rotateByAngle:2*M_PI duration:number];
+    SKAction *repeat = [SKAction repeatActionForever:rotation];
+    [holder runAction:repeat withKey:@"rotation"];
+}
+
+/*
+- (void) changeSpeed {
+    if (speed > 1) {
+        if(changeSpeedNum == 0) {
+            speed -=1;
+            [holder1 removeActionForKey:@"rotation"];
+            [self rotateCircle:speed];
+            speedNum += 1;
+            NSLog(@"Speed: %f",speed);
+            speedLabelNum.text = [NSString stringWithFormat:@"%d", speedNum];
+            changeSpeedNum = 1;
+        }
+        else {
+            [holder2 removeActionForKey:@"rotation"];
+            [self rotateRectangle:speed];
+            NSLog(@"Speed: %f",speed);
+            changeSpeedNum = 0;
+        }
+    }
+}
+ */
+
+-(void) didBeginContact:(SKPhysicsContact *)contact {
+    SKPhysicsBody* firstBody;
+    SKPhysicsBody* secondBody;
+    if (contact.bodyA.categoryBitMask > contact.bodyB.categoryBitMask) {
+        firstBody = contact.bodyA;
+        secondBody = contact.bodyB;
+    } else {
+        firstBody = contact.bodyB;
+        secondBody = contact.bodyA;
+    }
+    if([secondBody.node.name  isEqual:@"Rect"]){
+        NSLog(@"Bottom on table");
+    }
 }
 
 
@@ -130,8 +233,6 @@
     touchLeft = false;
 }
 
-
-
 -(void)update:(CFTimeInterval)currentTime {
     if(!gameOver && aCircle.physicsBody.dynamic == YES) {
         aCircle.physicsBody.velocity = CGVectorMake(xAcceleration * 600.0f, aCircle.physicsBody.velocity.dy);
@@ -155,7 +256,7 @@
         }
         score++;
         scoreLabel.text = [NSString stringWithFormat:@"%d", score];
-        if(aCircle.position.y < self.frame.size.height/2) {
+        if(aCircle.position.y > self.frame.size.height/2 -65) {
             gameOver = true;
             for (SKNode *node in [self children]) {
                 [node removeFromParent];

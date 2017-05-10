@@ -138,7 +138,7 @@
     CGRect rect;
     CGPoint origin;
     origin.y = 0;
-    origin.x = 30;
+    origin.x = 0;
     rect.origin = origin;
     rect.size = size;
     
@@ -202,7 +202,7 @@
 
     
     origin.y = 0;
-    origin.x = -800;
+    origin.x = -850;
     rect.origin = origin;
     rect.size = size;
     
