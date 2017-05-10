@@ -15,6 +15,9 @@
     SKShapeNode *myRectangle1;
     
     SKLabelNode* scoreLabel;
+    SKLabelNode* gameOverLabel;
+    SKLabelNode* finalScore;
+    SKLabelNode* startNode;
     
     SKNode* holder1;
     
@@ -33,6 +36,11 @@
 @implementation GameScene
 
 - (void)didMoveToView:(SKView *)view {
+    [self setUp];
+}
+
+-(void)setUp {
+    self.backgroundColor = [SKColor blackColor];
     [self addBall];
     self.physicsWorld.gravity = CGVectorMake(0.0f, -9.8f);
     self.physicsWorld.contactDelegate = self;
@@ -108,9 +116,15 @@
         else {
             touchLeft = true;
         }
-
+    }
+    else {
+        for(SKNode *node in [self children]) {
+            [node removeFromParent];
+        }
+        [self setUp];
     }
 }
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     touchRight = false;
     touchLeft = false;
@@ -141,15 +155,40 @@
         }
         score++;
         scoreLabel.text = [NSString stringWithFormat:@"%d", score];
-        if(aCircle.position.y > self.frame.size.height/2) {
+        if(aCircle.position.y < self.frame.size.height/2) {
             gameOver = true;
+            for (SKNode *node in [self children]) {
+                [node removeFromParent];
+            }
             [self gameOver];
         }
     }
 }
 
 -(void)gameOver {
+    gameOverLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    gameOverLabel.fontSize = 70;
+    gameOverLabel.fontColor = [SKColor whiteColor];
+    gameOverLabel.position = CGPointMake(0.0f, 250.0f);;
+    gameOverLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    [gameOverLabel setText:@"Game Over"];
+    [self addChild:gameOverLabel];
     
+    finalScore = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    finalScore.fontSize = 70;
+    finalScore.fontColor = [SKColor whiteColor];
+    finalScore.position = CGPointMake(0.0f, 0.0f);
+    finalScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    [finalScore setText:[NSString stringWithFormat:@"Final Score: %d", score]];
+    [self addChild:finalScore];
+    
+    startNode = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    startNode.fontSize = 55;
+    startNode.fontColor = [SKColor whiteColor];
+    startNode.position = CGPointMake(0.0f, -250.0f);
+    startNode.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    [startNode setText:@"Tap to Try Again"];
+    [self addChild:startNode];
 }
 
 @end
