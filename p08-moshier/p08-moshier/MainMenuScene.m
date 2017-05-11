@@ -96,7 +96,7 @@
     instruct4.fontColor = [SKColor whiteColor];
     instruct4.position = CGPointMake(0, -400);
     instruct4.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
-    [instruct4 setText:@"Don't Hit the Top"];
+    [instruct4 setText:@"Don't Run Out of Time"];
     [self addChild:instruct4];
     
     instruct5 = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];

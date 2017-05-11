@@ -23,6 +23,8 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     SKLabelNode* gameOverLabel;
     SKLabelNode* finalScore;
     SKLabelNode* startNode;
+    SKLabelNode* timeNode;
+    SKLabelNode* levelNode;
     
     SKNode* holder;
     
@@ -33,7 +35,10 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     bool touchRight;
     
     double speed;
+    int time;
     int score;
+    int level;
+    
 }
 
 @end;
@@ -51,14 +56,31 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     self.physicsWorld.contactDelegate = self;
     gameOver = false;
     xAcceleration = 0;
+    level = 1;
+    score = 0;
+    time = 0;
     
     scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
     scoreLabel.fontSize = 40;
     scoreLabel.fontColor = [SKColor whiteColor];
     scoreLabel.position = CGPointMake(0, self.frame.size.height/2 -50);
-    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
-    score = 0;
+    scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
     scoreLabel.text = [NSString stringWithFormat:@"%d", score];
+    
+    timeNode = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
+    timeNode.fontSize = 40;
+    timeNode.fontColor = [SKColor whiteColor];
+    timeNode.position = CGPointMake(-self.frame.size.width/2 +50, self.frame.size.height/2 -50);
+    timeNode.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    timeNode.text = [NSString stringWithFormat:@"%d", time];
+    
+    levelNode = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
+    levelNode.fontSize = 40;
+    levelNode.fontColor = [SKColor whiteColor];
+    levelNode.position = CGPointMake(self.frame.size.width/2 -50, self.frame.size.height/2 -50);
+    levelNode.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeRight;
+    levelNode.text = [NSString stringWithFormat:@"%d", level];
+    
     holder = [SKNode node];
     int y = -self.size.height/2;
     while(y <= self.size.height/2-200) {
@@ -67,6 +89,8 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     }
     [self addRectangle:y];
     [self addChild:scoreLabel];
+    [self addChild:levelNode];
+    [self addChild:timeNode];
     
     CGSize size;
     size.height = 2;
@@ -84,7 +108,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     topBar.fillColor = [SKColor whiteColor];
     [self addChild:topBar];
     [self addChild:holder];
-    //[self moveRectangles:2];
 }
 
 - (void) addBall {
@@ -143,6 +166,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     Rectangle1.physicsBody.categoryBitMask = CollisionCategoryRegularPlatform;
     Rectangle1.physicsBody.contactTestBitMask = CollisionCategoryPlayer;
     Rectangle1.position = origin;
+    Rectangle1.name = @"Rect";
     
     SKSpriteNode *Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor greenColor] size:rect2.size];
     SKPhysicsBody *rectBody2 = [SKPhysicsBody bodyWithRectangleOfSize:rect2.size];
@@ -153,6 +177,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     Rectangle2.physicsBody.categoryBitMask = CollisionCategoryRegularPlatform;
     Rectangle2.physicsBody.contactTestBitMask = CollisionCategoryPlayer;
     Rectangle2.position = origin2;
+    Rectangle2.name = @"Rect";
     
     [holder addChild:Rectangle1];
     [holder addChild:Rectangle2];
@@ -161,34 +186,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
 -(int)getRandomNumberBetween:(int)from to:(int)to {
     return (int)from + arc4random() % (to-from+1);
 }
-
--(void) moveRectangles:(int)number {
-    SKAction *move = [SKAction moveToY:holder.position.y+100 duration:number];
-    SKAction *repeat = [SKAction repeatActionForever:move];
-    [holder runAction:repeat withKey:@"moveUp"];
-}
-
-/*
-- (void) changeSpeed {
-    if (speed > 1) {
-        if(changeSpeedNum == 0) {
-            speed -=1;
-            [holder1 removeActionForKey:@"rotation"];
-            [self rotateCircle:speed];
-            speedNum += 1;
-            NSLog(@"Speed: %f",speed);
-            speedLabelNum.text = [NSString stringWithFormat:@"%d", speedNum];
-            changeSpeedNum = 1;
-        }
-        else {
-            [holder2 removeActionForKey:@"rotation"];
-            [self rotateRectangle:speed];
-            NSLog(@"Speed: %f",speed);
-            changeSpeedNum = 0;
-        }
-    }
-}
- */
 
 -(void) didBeginContact:(SKPhysicsContact *)contact {
     SKPhysicsBody* firstBody;
@@ -200,7 +197,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
     }
-    NSLog(@"HEY");
 }
 
 
@@ -252,14 +248,20 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         if(xAcceleration < -1.3) {
             xAcceleration = -1.3;
         }
-        score++;
+        score += 1*level;
         scoreLabel.text = [NSString stringWithFormat:@"%d", score];
-        if(aCircle.position.y > self.frame.size.height/2 -65) {
-            gameOver = true;
-            for (SKNode *node in [self children]) {
-                [node removeFromParent];
+        if(aCircle.position.y < -self.frame.size.height/2) {
+            [holder removeFromParent];
+            holder = [SKNode node];
+            [self addChild:holder];
+            int y = -self.size.height/2;
+            while(y <= self.size.height/2-200) {
+                [self addRectangle:y];
+                y+=100;
             }
-            [self gameOver];
+            level++;
+            levelNode.text = [NSString stringWithFormat:@"%d", level];
+            aCircle.position = CGPointMake(aCircle.position.x, self.frame.size.height/2);
         }
     }
 }
