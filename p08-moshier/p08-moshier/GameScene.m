@@ -27,6 +27,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     SKLabelNode* startNode;
     SKLabelNode* timeNode;
     SKLabelNode* levelNode;
+    SKLabelNode* finalNum;
     
     SKNode* holder;
     
@@ -425,7 +426,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     gameOverLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
     gameOverLabel.fontSize = 70;
     gameOverLabel.fontColor = [SKColor whiteColor];
-    gameOverLabel.position = CGPointMake(0.0f, 250.0f);;
+    gameOverLabel.position = CGPointMake(0.0f, 500.0f);;
     gameOverLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
     [gameOverLabel setText:@"Game Over"];
     [self addChild:gameOverLabel];
@@ -433,10 +434,18 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     finalScore = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
     finalScore.fontSize = 70;
     finalScore.fontColor = [SKColor whiteColor];
-    finalScore.position = CGPointMake(0.0f, 0.0f);
+    finalScore.position = CGPointMake(0.0f, 250.0f);
     finalScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
-    [finalScore setText:[NSString stringWithFormat:@"Final Score: %d", score]];
+    [finalScore setText:[NSString stringWithFormat:@"Final Score:"]];
     [self addChild:finalScore];
+    
+    finalNum = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    finalNum.fontSize = 70;
+    finalNum.fontColor = [SKColor whiteColor];
+    finalNum.position = CGPointMake(0.0f, 0.0f);
+    finalNum.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeCenter;
+    [finalNum setText:[NSString stringWithFormat:@"%d",score]];
+    [self addChild:finalNum];
     
     startNode = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
     startNode.fontSize = 55;
