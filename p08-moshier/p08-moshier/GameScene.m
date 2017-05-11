@@ -199,6 +199,26 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     }
 }
 
+-(void)flashMessage:(NSString *)message atPosition:(CGPoint)position duration:(NSTimeInterval)duration {
+    //a method to make a sprite for a flash message at a certain position on the screen
+    //to be used for instructions
+    
+    //make a label that is invisible
+    SKLabelNode *flashLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
+    flashLabel.position = position;
+    flashLabel.fontSize = 70;
+    flashLabel.fontColor = [SKColor whiteColor];
+    flashLabel.text = message;
+    [self addChild:flashLabel];
+    //make an animation sequence to flash in and out the label
+    SKAction *flashAction = [SKAction sequence:@[
+                                                 [SKAction fadeInWithDuration:duration/3.0],
+                                                 [SKAction waitForDuration:duration],
+                                                 [SKAction fadeOutWithDuration:duration/3.0]
+                                                 ]];
+    // run the sequence then delete the label
+    [flashLabel runAction:flashAction completion:^{[flashLabel removeFromParent];}];
+}
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     if(!gameOver) {
@@ -251,11 +271,11 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
                 xAcceleration = (xAcceleration += 0.01);
             }
         }
-        if(xAcceleration > 1.3) {
-            xAcceleration = 1.3;
+        if(xAcceleration > 1) {
+            xAcceleration = 1;
         }
-        if(xAcceleration < -1.3) {
-            xAcceleration = -1.3;
+        if(xAcceleration < -1) {
+            xAcceleration = -1;
         }
         score += 1*level;
         scoreLabel.text = [NSString stringWithFormat:@"%d", score];
@@ -269,6 +289,9 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
                 y+=100;
             }
             level++;
+            NSString *myMessage;
+            myMessage = [NSString stringWithFormat:@"Level: %d",level];
+            [self flashMessage:myMessage atPosition:CGPointMake(0, self.frame.size.height/2 -150) duration:1.5];
             levelNode.text = [NSString stringWithFormat:@"%d", level];
             aCircle.position = CGPointMake(aCircle.position.x, self.frame.size.height/2);
         }
