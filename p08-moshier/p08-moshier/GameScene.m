@@ -156,8 +156,52 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     rect2.origin = origin2;
     rect.size = size;
     rect2.size = size;
+    SKSpriteNode *Rectangle1;
+    SKSpriteNode *Rectangle2;
     
-    SKSpriteNode *Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor greenColor] size:rect.size];
+    if(level%10 == 1) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor greenColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor greenColor] size:rect2.size];
+    }
+    else if(level%10 == 0) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor blueColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor blueColor] size:rect2.size];
+    }
+    else if(level%10 == 2) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor orangeColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor orangeColor] size:rect2.size];
+    }
+    else if(level%10 == 3) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor purpleColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor purpleColor] size:rect2.size];
+    }
+    else if(level%10 == 4) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor magentaColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor magentaColor] size:rect2.size];
+    }
+    else if(level%10 == 5) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor yellowColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor yellowColor] size:rect2.size];
+    }
+    else if(level%10 == 6) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor lightGrayColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor lightGrayColor] size:rect2.size];
+    }
+    else if(level%10 == 7) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor redColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor redColor] size:rect2.size];
+    }
+    else if(level%10 == 8) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor cyanColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor cyanColor] size:rect2.size];
+    }
+    else if(level%10 == 9) {
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor whiteColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor whiteColor] size:rect2.size];
+    }
+    else{
+        
+    }
     SKPhysicsBody *rectBody = [SKPhysicsBody bodyWithRectangleOfSize:rect.size];
     [rectBody setDynamic:NO];
     [rectBody setUsesPreciseCollisionDetection:YES];
@@ -168,7 +212,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     Rectangle1.position = origin;
     Rectangle1.name = @"Rect";
     
-    SKSpriteNode *Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor greenColor] size:rect2.size];
     SKPhysicsBody *rectBody2 = [SKPhysicsBody bodyWithRectangleOfSize:rect2.size];
     [rectBody2 setDynamic:NO];
     [rectBody2 setUsesPreciseCollisionDetection:YES];
@@ -199,14 +242,14 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     }
 }
 
--(void)flashMessage:(NSString *)message atPosition:(CGPoint)position duration:(NSTimeInterval)duration {
+-(void)flashMessage:(NSString *)message atPosition:(CGPoint)position duration:(NSTimeInterval)duration size:(int)mySize {
     //a method to make a sprite for a flash message at a certain position on the screen
     //to be used for instructions
     
     //make a label that is invisible
     SKLabelNode *flashLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
     flashLabel.position = position;
-    flashLabel.fontSize = 70;
+    flashLabel.fontSize = mySize;
     flashLabel.fontColor = [SKColor whiteColor];
     flashLabel.text = message;
     [self addChild:flashLabel];
@@ -283,15 +326,18 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
             [holder removeFromParent];
             holder = [SKNode node];
             [self addChild:holder];
+            level++;
             int y = -self.size.height/2;
             while(y <= self.size.height/2-200) {
                 [self addRectangle:y];
                 y+=100;
             }
-            level++;
+            time+=300;
             NSString *myMessage;
             myMessage = [NSString stringWithFormat:@"Level: %d",level];
-            [self flashMessage:myMessage atPosition:CGPointMake(0, self.frame.size.height/2 -150) duration:1.5];
+            [self flashMessage:myMessage atPosition:CGPointMake(0, self.frame.size.height/2 -150) duration:1.5 size:70];
+            myMessage = [NSString stringWithFormat:@"+300"];
+            [self flashMessage:myMessage atPosition:CGPointMake(-self.frame.size.width/2 +200, self.frame.size.height/2 -50) duration:.5 size:40];
             levelNode.text = [NSString stringWithFormat:@"%d", level];
             aCircle.position = CGPointMake(aCircle.position.x, self.frame.size.height/2);
         }
