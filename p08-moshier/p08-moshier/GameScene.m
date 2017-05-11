@@ -242,6 +242,15 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         if(touchLeft) {
             xAcceleration = (xAcceleration += -0.03);
         }
+        if(!touchRight && !touchLeft) {
+            NSLog(@"Acceleration: %f",xAcceleration);
+            if(xAcceleration > 0) {
+                xAcceleration = (xAcceleration -= 0.01);
+            }
+            else if(xAcceleration < 0){
+                xAcceleration = (xAcceleration += 0.01);
+            }
+        }
         if(xAcceleration > 1.3) {
             xAcceleration = 1.3;
         }
