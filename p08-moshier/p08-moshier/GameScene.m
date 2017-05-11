@@ -11,6 +11,7 @@
 typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     CollisionCategoryPlayer   = 0x1 << 0,
     CollisionCategoryRegularPlatform = 0x1 << 1,
+    CollisionCategoryTriangle = 0x1 << 2,
 };
 
 @interface GameScene () <SKPhysicsContactDelegate> {
@@ -18,6 +19,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
 
     SKShapeNode *circleShape;
     SKShapeNode *topBar;
+    SKShapeNode *myTriangle;
     
     SKLabelNode* scoreLabel;
     SKLabelNode* gameOverLabel;
@@ -30,9 +32,11 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     
     CGFloat xAcceleration;
     
+    bool gotPowerUp;
     bool gameOver;
     bool touchLeft;
     bool touchRight;
+    bool timeFrozen;
     
     double speed;
     int time;
@@ -55,10 +59,13 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     self.physicsWorld.gravity = CGVectorMake(0.0f, -9.8f);
     self.physicsWorld.contactDelegate = self;
     gameOver = false;
+    gotPowerUp = false;
     xAcceleration = 0;
     level = 1;
     score = 0;
-    time = 1500;
+    time = 2000;
+    [self spawnPowerUp];
+    timeFrozen = false;
     
     scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
     scoreLabel.fontSize = 40;
@@ -145,7 +152,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     CGRect rect;
     CGRect rect2;
     int x = [self getRandomNumberBetween:self.size.width/8 to:self.size.width];
-    NSLog(@"x: %d\n",x);
     CGPoint origin;
     CGPoint origin2;
     origin.x = x;
@@ -180,8 +186,8 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor magentaColor] size:rect2.size];
     }
     else if(level%10 == 5) {
-        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor yellowColor] size:rect.size];
-        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor yellowColor] size:rect2.size];
+        Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor brownColor] size:rect.size];
+        Rectangle2 = [SKSpriteNode spriteNodeWithColor:[UIColor brownColor] size:rect2.size];
     }
     else if(level%10 == 6) {
         Rectangle1 = [SKSpriteNode spriteNodeWithColor:[UIColor lightGrayColor] size:rect.size];
@@ -239,6 +245,32 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     } else {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
+    }
+    if([firstBody.node.name  isEqual: @"TRI"]){
+        [myTriangle removeFromParent];
+        gotPowerUp = true;
+        int powerUpReward = [self getRandomNumberBetween:0 to:10];
+        NSLog(@"PowerUp: %d",powerUpReward);
+        if(powerUpReward < 5) {
+            time+=300;
+            NSString *myMessage;
+            myMessage = [NSString stringWithFormat:@"+300"];
+            [self flashMessage:myMessage atPosition:CGPointMake(-self.frame.size.width/2 +200, self.frame.size.height/2 -50) duration:.5 size:40];
+        }
+        else if(powerUpReward >5 && powerUpReward <10) {
+            int scorePlus;
+            scorePlus = level*2000;
+            score+=scorePlus;
+            NSString *myMessage;
+            myMessage = [NSString stringWithFormat:@"+%d",scorePlus];
+            [self flashMessage:myMessage atPosition:CGPointMake(200, self.frame.size.height/2 -50) duration:.5 size:40];
+        }
+        else {
+            timeFrozen = true;
+            NSString *myMessage;
+            myMessage = [NSString stringWithFormat:@"Time Frozen!"];
+            [self flashMessage:myMessage atPosition:CGPointMake(0, self.frame.size.height/2 -150) duration:1.5 size:70];
+        }
     }
 }
 
@@ -306,7 +338,6 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
             xAcceleration = (xAcceleration += -0.03);
         }
         if(!touchRight && !touchLeft) {
-            NSLog(@"Acceleration: %f",xAcceleration);
             if(xAcceleration > 0) {
                 xAcceleration = (xAcceleration -= 0.01);
             }
@@ -320,10 +351,9 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
         if(xAcceleration < -1) {
             xAcceleration = -1;
         }
-        score += 1*level;
-        scoreLabel.text = [NSString stringWithFormat:@"%d", score];
         if(aCircle.position.y < -self.frame.size.height/2) {
             [holder removeFromParent];
+            
             holder = [SKNode node];
             [self addChild:holder];
             level++;
@@ -332,6 +362,10 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
                 [self addRectangle:y];
                 y+=100;
             }
+            if(!gotPowerUp) {
+                [myTriangle removeFromParent];
+            }
+            gotPowerUp = false;
             time+=300;
             NSString *myMessage;
             myMessage = [NSString stringWithFormat:@"Level: %d",level];
@@ -340,17 +374,51 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
             [self flashMessage:myMessage atPosition:CGPointMake(-self.frame.size.width/2 +200, self.frame.size.height/2 -50) duration:.5 size:40];
             levelNode.text = [NSString stringWithFormat:@"%d", level];
             aCircle.position = CGPointMake(aCircle.position.x, self.frame.size.height/2);
+            [self spawnPowerUp];
+            timeFrozen = false;
         }
-        time--;
-        timeNode.text = [NSString stringWithFormat:@"%d", time];
-        if(time == 0) {
-            gameOver = true;
-            for(SKNode *node in [self children]) {
-                [node removeFromParent];
+        if(!timeFrozen) {
+            score += 1*level;
+            scoreLabel.text = [NSString stringWithFormat:@"%d", score];
+            time--;
+            timeNode.text = [NSString stringWithFormat:@"%d", time];
+            if(time == 0) {
+                gameOver = true;
+                for(SKNode *node in [self children]) {
+                    [node removeFromParent];
+                }
+                [self gameOver];
             }
-            [self gameOver];
         }
     }
+}
+
+-(void) spawnPowerUp {
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    
+    [path moveToPoint:CGPointMake(0, 0)];
+    [path addLineToPoint:CGPointMake(40,0)];
+    [path addLineToPoint:CGPointMake(20, 40)];
+    [path closePath];
+    
+    int x = [self getRandomNumberBetween:-self.size.width/2+100 to:self.size.width/2-100];
+    int y = [self getRandomNumberBetween:-5 to:5];
+    y = y*100 - 56;
+    
+    myTriangle = [SKShapeNode shapeNodeWithPath:path.CGPath];
+    myTriangle.strokeColor = [SKColor yellowColor];
+    myTriangle.fillColor = [SKColor yellowColor];
+    myTriangle.position = CGPointMake(x, y);
+    myTriangle.name = @"TRI";
+    [self addChild:myTriangle];
+    
+    SKPhysicsBody *triBody = [SKPhysicsBody bodyWithPolygonFromPath:(path.CGPath)];
+    [triBody setDynamic:NO];
+    [triBody setUsesPreciseCollisionDetection:YES];
+    myTriangle.physicsBody = triBody;
+    myTriangle.physicsBody.collisionBitMask = CollisionCategoryPlayer;
+    myTriangle.physicsBody.categoryBitMask = CollisionCategoryTriangle;
+    myTriangle.physicsBody.contactTestBitMask = CollisionCategoryPlayer;
 }
 
 -(void)gameOver {
