@@ -58,7 +58,7 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
     xAcceleration = 0;
     level = 1;
     score = 0;
-    time = 0;
+    time = 1500;
     
     scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
     scoreLabel.fontSize = 40;
@@ -294,6 +294,15 @@ typedef NS_OPTIONS(uint32_t, CollisionCategory) {
             [self flashMessage:myMessage atPosition:CGPointMake(0, self.frame.size.height/2 -150) duration:1.5];
             levelNode.text = [NSString stringWithFormat:@"%d", level];
             aCircle.position = CGPointMake(aCircle.position.x, self.frame.size.height/2);
+        }
+        time--;
+        timeNode.text = [NSString stringWithFormat:@"%d", time];
+        if(time == 0) {
+            gameOver = true;
+            for(SKNode *node in [self children]) {
+                [node removeFromParent];
+            }
+            [self gameOver];
         }
     }
 }
